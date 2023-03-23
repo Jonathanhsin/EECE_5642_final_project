@@ -9,7 +9,7 @@ app = dash.Dash(__name__)
 # Import and filter data into pandas data frame
 df = pd.read_csv("Parking_Meters.csv")
 
-Street_list = np.append('ALL_STREET', df['STREET'].unique())
+Street_list = np.append('ALL_BLK', df['BLK_NO'].unique())
 visible = Street_list
 input_types = ['text']
 base_case = True
@@ -49,13 +49,13 @@ app.layout = html.Div([
 
 
 
-def update_graph(street_name):
-    print("text: " + str(street_name))
+def update_graph(blk_name):
+    print("text: " + str(blk_name))
 
     if (street_name == None):
         filtered_df = df.copy()
     else:
-        temp = [v for v in df['STREET'] if v.startswith(street_name)]
+        temp = df[df['BLK_NO'] == blk_name]
 
     boston_map = px.scatter_mapbox(
         filtered_df,
