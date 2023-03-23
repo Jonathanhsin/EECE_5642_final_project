@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 
+
 # read the data from string
 parking_meters = pd.read_csv("Parking_Meters.csv")
 
@@ -49,7 +50,6 @@ for BLK in BLK_list:
 # create figure
 fig = go.Figure(data=traces)
 
-# add buttons
 fig.update_layout(
     mapbox=dict(
         style='open-street-map',
