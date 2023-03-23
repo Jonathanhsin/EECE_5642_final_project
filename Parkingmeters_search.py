@@ -52,10 +52,10 @@ app.layout = html.Div([
 def update_graph(blk_name):
     print("text: " + str(blk_name))
 
-    if (street_name == None):
+    if (blk_name == None):
         filtered_df = df.copy()
     else:
-        temp = df[df['BLK_NO'] == blk_name]
+        filtered_df = df[df['BLK_NO'] == blk_name]
 
     boston_map = px.scatter_mapbox(
         filtered_df,
