@@ -19,6 +19,15 @@ input_types = ['text']
 pay_policy = df['PAY_POLICY']
 pay_times = []
 
+# Creating lists for streets
+orig_names = df['STREET']
+print(orig_names[1])
+street_names = []
+for i in range(0, len(orig_names)):
+    street_names.append((orig_names[i].split(" ST")[0]).split(" RD")[0])
+df['STREET_NAMES'] = street_names
+street_names = [*set(street_names)]
+
 for times in pay_policy:
     just_the_time = times.split(" ")
     pay_times.append(just_the_time[0])
@@ -112,6 +121,7 @@ app.layout = html.Div([
     dcc.Graph(id="mymap"),
 ])
 
+
 @app.callback(
     Output(component_id='mymap', component_property='figure'),
     [Input(component_id='my_{}'.format(x), component_property='value')
@@ -119,12 +129,9 @@ app.layout = html.Div([
      ],
     Input(component_id='day_sections', component_property='value'),
 )
-
 def update_graph(blk_name, day_section):
     print("text: " + str(blk_name))
-    day = [v for v in day_options if day_section in v]
-    print("text: " + str(day))
-    if blk_name is None or blk_name not in Street_list:
+    if blk_name is None or blk_name.upper() not in street_names:
         filtered_df = df.copy()
         boston_map = px.scatter_mapbox(
             filtered_df,
@@ -136,7 +143,8 @@ def update_graph(blk_name, day_section):
         )
         boston_map.update_traces(marker=dict(size=5, color="green"))
     else:
-        filtered_df = df[df['BLK_NO'] == blk_name]
+        print(blk_name.upper())
+        filtered_df = df[df["STREET_NAMES"] == blk_name.upper()]
         boston_map = px.scatter_mapbox(
             filtered_df,
             lat=filtered_df['LATITUDE'],
@@ -157,5 +165,7 @@ def update_graph(blk_name, day_section):
         ]))
     return boston_map
 
+
 if __name__ == '__main__':
     app.run_server(debug=True)
+
