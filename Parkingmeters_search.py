@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import dash
 from dash import dcc, html, Input, Output
-from dash.exceptions import PreventUpdate
 
 app = dash.Dash(__name__)
 
@@ -13,6 +12,7 @@ df = pd.read_csv("Parking_Meters.csv")
 
 Street_list = np.append('ALL_BLK', df['BLK_NO'].unique())
 visible = Street_list
+day_options = ['Monday-Saturday', 'Sunday']
 input_types = ['text']
 
 # Creating lists for times
@@ -64,7 +64,7 @@ app.layout = html.Div([
         dcc.Input(
             id='my_{}'.format(x),
             type=x,
-            placeholder="insert text",  # A hint to the user of what can be entered in the control
+            placeholder="Insert Street Name",  # A hint to the user of what can be entered in the control
             debounce=True,  # Changes to input are sent to Dash server only on enter or losing focus
             minLength=0, maxLength=50,  # Ranges for character length inside input box
             autoComplete='on',
@@ -80,6 +80,35 @@ app.layout = html.Div([
     ]),
 
     html.Br(),
+    html.Div([
+            dcc.Input(
+                id='day_sections',
+                type='text',
+                placeholder='Enter Day',
+                debounce=True,           # changes to input are sent to Dash server only on enter or losing focus
+                pattern=r"^[A-Za-z].*",  # Regex: string must start with letters only
+                spellCheck=True,
+                name='text',             # the name of the control, which is submitted with the form data
+                list='browser',          # identifies a list of pre-defined options to suggest to the user
+                n_submit=0,              # number of times the Enter key was pressed while the input had focus
+                n_submit_timestamp=-1,   # last time that Enter was pressed
+                autoFocus=True,          # the element should be automatically focused after the page loaded
+                n_blur=0,                # number of times the input lost focus
+                n_blur_timestamp=-1,     # last time the input lost focus.
+                # selectionDirection='', # the direction in which selection occurred
+                # selectionStart='',     # the offset into the element's text content of the first selected character
+                # selectionEnd='',       # the offset into the element's text content of the last selected character
+            ),
+        ]),
+
+    html.Br(),
+    html.Datalist(id='browser', children=[
+        html.Option(value="Monday-Saturday"),
+        html.Option(value="Sunday"),
+
+    ]),
+
+    html.Br(),
     dcc.Graph(id="mymap"),
 ])
 
@@ -88,10 +117,13 @@ app.layout = html.Div([
     [Input(component_id='my_{}'.format(x), component_property='value')
      for x in input_types
      ],
+    Input(component_id='day_sections', component_property='value'),
 )
 
-def update_graph(blk_name):
+def update_graph(blk_name, day_section):
     print("text: " + str(blk_name))
+    day = [v for v in day_options if day_section in v]
+    print("text: " + str(day))
     if blk_name is None or blk_name not in Street_list:
         filtered_df = df.copy()
         boston_map = px.scatter_mapbox(
