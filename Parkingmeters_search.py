@@ -117,6 +117,25 @@ app.layout = html.Div([
 
     ]),
 
+    html.Div([
+        dcc.Input(
+            id='hour_sections',
+            type='text',
+            placeholder="Insert Hour",  # A hint to the user of what can be entered in the control
+            debounce=True,  # Changes to input are sent to Dash server only on enter or losing focus
+            minLength=0, maxLength=50,  # Ranges for character length inside input box
+            autoComplete='on',
+            disabled=False,  # Disable input box
+            readOnly=False,  # Make input box read only
+            required=False,  # Require user to insert something into input box
+            size="20",  # Number of characters that will be visible inside box
+            # style={'':''}                     # Define styles for dropdown (Dropdown video: 13:05)
+            # className='',                     # Define style from separate CSS document (Dropdown video: 13:05)
+            # persistence='',                   # Stores user's dropdown changes in memory (Dropdown video: 16:20)
+            # persistence_type='',
+        ),
+    ]),
+
     html.Br(),
     dcc.Graph(id="mymap"),
 ])
@@ -128,9 +147,12 @@ app.layout = html.Div([
      for x in input_types
      ],
     Input(component_id='day_sections', component_property='value'),
+    Input(component_id='hour_sections', component_property='value'),
 )
-def update_graph(blk_name, day_section):
+def update_graph(blk_name, day_value, hour_value):
     print("text: " + str(blk_name))
+    print("day: " + str(day_value))
+    print("hour: " + str(hour_value))
     if blk_name is None or blk_name.upper() not in street_names:
         filtered_df = df.copy()
         boston_map = px.scatter_mapbox(
@@ -149,7 +171,7 @@ def update_graph(blk_name, day_section):
             filtered_df,
             lat=filtered_df['LATITUDE'],
             lon=filtered_df['LONGITUDE'],
-            zoom=17,
+            zoom=16,
             custom_data=['STREET', 'LATITUDE', 'LONGITUDE', 'PAY_POLICY']
         )
         boston_map.update_traces(marker=dict(size=10, color="green"))
@@ -168,4 +190,3 @@ def update_graph(blk_name, day_section):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-
